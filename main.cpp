@@ -6,15 +6,42 @@
 #include <ctime>
 #include <limits>
 
+void win_game(int &balance, int betting_amount, double win_multiplier, std::string user_name, std::string password) //normal winning game, where the users balance is increased based on the betting amount
+{
+    balance = balance + (betting_amount * win_multiplier);
+    std::cout << "Well done, you got it right, you won: " << betting_amount * win_multiplier << " and your new balance is: " << balance << "\n";
+    std::ofstream user_details1(user_name); //creates a new file for the user
+    user_details1 << user_name << "\n" << password << "\n"<< balance;
+     user_details1.close();
+}
+void win_jackpot_game(int &balance, int betting_amount, double win_multiplier, std::string user_name, std::string password) //adds the super big multiplier amount to the user's balance
+{
+    balance = balance + (betting_amount * win_multiplier * win_multiplier * 20);
+    std::cout << "Well done, you got it right, you won: " << betting_amount * win_multiplier * win_multiplier * 20 << " and your new balance is: " << balance << "\n"; //multiplier is massive as it is a 1/100 chance
+
+    std::ofstream user_details1(user_name); //creates a new file for the user
+    user_details1 << user_name << "\n"
+                  << password << "\n"
+                  << balance;
+}
+void lose_game(int &balance, int betting_amount, double win_multiplier, std::string user_name, std::string password) //the user loses the game
+{
+    balance = balance - betting_amount;
+    std::cout << "Oh no, you got it wrong, you lost: " << betting_amount << " and your new balance is: " << balance << "\n";
+    std::ofstream user_details1(user_name); //creates a new file for the user
+    user_details1 << user_name << "\n"
+                  << password << "\n"
+                  << balance;
+}
 bool string_equal(const std::string &a, const std::string &b) //checks if strings are equal
 {
     return std::equal(a.begin(), a.end(), b.begin(), b.end(), [](char a, char b)
                       { return tolower(a) == tolower(b); });
 }
 
-void play_game(std::string user_name, int balance) //plays the game
+void play_highlow_game(std::string user_name, std::string password, int balance) //plays the game
 {
-    std::cout << "<=============================================RULES=============================================>\n1. You bet an amount of money\n2. We give you a hint number and we ask you if the number is \"Higher\", \"Lower\", or \"Jackpot\"\n3. If you guess the number correct, you will get a multiple of the number you bet\n";
+    std::cout << "<=============================================RULES=============================================>\n1. You bet an amount of money\n2. We give you a hint number and we ask you if the number is \"Higher\", \"Lower\", or \"Jackpot\"\n3. If you guess the number correct, you will get a multiple of the number you bet (if you get jackpot right, you will get a LARGE multiple)\n";
     srand(time(NULL));                    //sets the seed
     int hidden_number = rand() % 100 + 1; //hidden number
     int hint_number = rand() % 100 + 1;   //hint number
@@ -35,17 +62,70 @@ void play_game(std::string user_name, int balance) //plays the game
         }
     }
     std::cout << "Guess if the number is higher or lower or the same as " << hint_number << "\n Please enter \"Higher\" or \"Lower\" or \"Jackpot\"\n";
-    while (true)
+    std::cout << "the hidden number is" << hidden_number << "and the multiplier is" << win_multiplier << "\n";
+    while (true) //this makes the user enter higher or lower
     {
         std::cin >> user_input;
-        if (string_equal(user_input, "higher") && hidden_number > hint_number || string_equal(user_input, "lower") && hidden_number < hint_number || string_equal(user_input, "jackpot") && hidden_number == hint_number) //if user answer is correct(ignores case sensitivity)
+        if (string_equal(user_input, "higher"))
+        {
+            if (hidden_number > hint_number) //if user was correct
+            {
+                win_game(balance, betting_amount, win_multiplier, user_name, password); //win game
+                break;
+            }
+            else
+            {
+                lose_game(balance, betting_amount, win_multiplier, user_name, password); //lose game
+                break;
+            }
+        }
+        else if (string_equal(user_input, "lower"))
+        {
+            if (hidden_number < hint_number) //if user was correct
+            {
+                win_game(balance, betting_amount, win_multiplier, user_name, password); //win game
+                break;
+            }
+            else //if user was wrong
+            {
+                lose_game(balance, betting_amount, win_multiplier, user_name, password); //lose game
+                break;
+            }
+        }
+        else if (string_equal(user_input, "jackpot"))
+        {
+            if (hidden_number == hint_number) //if user was correct
+            {
+                win_jackpot_game(balance, betting_amount, win_multiplier, user_name, password);
+                break;
+            }
+            else
+            {
+                lose_game(balance, betting_amount, win_multiplier, user_name, password); //lose game
+                break;
+            }
+        }
+        else
+        {
+            std::cout << "Nope, that is not an acceptable response, please check what you wrote and retype your answer\n";
+        }
+        /*       if (string_equal(user_input, "higher") && hidden_number > hint_number || string_equal(user_input, "lower") && hidden_number < hint_number || string_equal(user_input, "jackpot") && hidden_number == hint_number) //if user answer is correct(ignores case sensitivity)
         {
             balance = balance + balance * betting_amount;
         }
         else
         {
             balance = balance - betting_amount;
-        }
+        } */
+    }
+    if (balance < 100)//if balance is less than 100, the user is forced to exit
+    {
+        std::cout << "Your balance is too low, I'm gonna have to kick you out\n";
+        exit;
+    } 
+    else
+    {
+        std::cout << "Success\n";
     }
 }
 void check_balance(std::string user_name, std::string password) //checks the balance of the user, and if the user has a balance less than 100, they automatically get 1000 coins to play with
@@ -64,11 +144,7 @@ void check_balance(std::string user_name, std::string password) //checks the bal
         user_details1 << user_name << "\n"
                       << password << "\n1000"; //rewrites everything
     }
-    else
-    {
-        std::cout << "you can play the game bro\n";
-    }
-    play_game(user_name, balance);
+    play_highlow_game(user_name, password, balance);
 }
 
 void registration_process(std::vector<std::string> unnacceptable_words)

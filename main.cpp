@@ -44,6 +44,17 @@ bool string_equal(const std::string &a, const std::string &b) //checks if string
 
 void play_blackjack_game(std::string user_name, std::string password, int balance) //plays blackjack
 {
+    std::cout << "<--------------------------------RULES------------------------------->\n<------------CARD VALUES--------->\n\n\
+    All face cards are worth 10\n Numbered cards from 2-10 are worth their number value\nAce is worth either eleven or one(which one will help you reach 21, if you go over 21 when your ace is worth 11, then your ace will be worth 1)\
+    \n\n<---------ORDER OF PLAY AND PLAYING OPTIONS--------->\n\n\
+    The goal of blackjack is to reach a card sum of 21 or have a sum closer to the number 21 than your opponent.\n\n\
+    First you bet a betting amount, which can not be larger than your balance.\n\n\
+    You start with 2 cards which you can see and the dealer also starts with 2 cards, one of which you can see. From here you can hit or stand, with \"hit\" allowing you to draw a card from a deck of cards and\n\"stand\" meaning you are happy with the sum you have\n\n\
+    After your first move, the dealer either hits or stands and then it will be your turn. If you used \"stand\" on your first turn, it is automatically the dealer's turn until they stand or go over 21.\n\n\
+    If you used \"hit\" on your first turn and you do not go over 21, then you are given the options of hit or stand, where you can draw another card or stand. This cycle continues until either one player has gone\nover 21, or both players have used stand.\n\n\
+    If both players used stand, then the player with the sum closest to 21 wins. If both people have the same sum, then the person with the lower amount of cards win. If both players have the same sum and the same\nnumber of cards, then it is a tie, and the betting amount is returned.\n\n\
+    If you win, you gain twice your betting amount and if you lose, you lose your betting amount.\n"; 
+    //some rules idk I copied this from the internet
     //rules LMAO WHAT ARE THE RULES
     //display your cards and one of the NPC's cards
     
@@ -247,7 +258,7 @@ void login_process()
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //clears cin cooldown, as the program was skipping over this line
     std::cout << "\nUsername: ";
     std::getline(std::cin, username); //gets username
-    std::cout << "Password: ";
+    std::cout << "\nPassword: ";
     std::getline(std::cin, password); //gets password
     std::ifstream file(username);     //opens file with username login
     std::string user, pass;           //used to get data from the file
